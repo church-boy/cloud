@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Management App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      input,
+      button {
+        padding: 10px;
+        font-size: 16px;
+      }
+
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #0056b3;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background: #f1f1f1;
+        margin-bottom: 10px;
+        border-radius: 4px;
+      }
+
+      .actions button {
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Movie Management App</h1>
+
+      <!-- Form for Adding or Editing -->
+      <form id="movie-form">
+        <input type="hidden" id="movie-id" />
+        <input type="text" id="title" placeholder="Title" required />
+        <input type="text" id="year" placeholder="Year" required />
+        <input type="text" id="genre" placeholder="Genre" required />
+        <button type="submit">Save</button>
+      </form>
+
+      <!-- Movie List -->
+      <h2>Movies</h2>
+      <ul id="movie-list"></ul>
+    </div>
+
+    <script>
+      const API_URL = "http://localhost:5000/movies";
+      const movieForm = document.getElementById("movie-form");
+      const movieList = document.getElementById("movie-list");
+
+      // Fetch Movies
+      async function fetchMovies() {
+        const res = await fetch(API_URL);
+        const movies = await res.json();
+        displayMovies(movies);
+      }
+
+      // Display Movies
+      function displayMovies(movies) {
+        movieList.innerHTML = "";
+        movies.forEach((movie) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+          <span>${movie.title} (${movie.year}) - ${movie.genre}</span>
+          <div class="actions">
+            <button onclick="editMovie('${movie._id}')">Edit</button>
+            <button onclick="deleteMovie('${movie._id}')">Delete</button>
+          </div>
+        `;
+          movieList.appendChild(li);
+        });
+      }
+
+      // Add or Edit Movie
+      movieForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("movie-id").value;
+        const title = document.getElementById("title").value;
+        const year = document.getElementById("year").value;
+        const genre = document.getElementById("genre").value;
+
+        const movie = { title, year, genre };
+
+        if (id) {
+          await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(movie),
+          });
+        } else {
+          await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(movie),
+          });
+        }
+
+        movieForm.reset();
+        fetchMovies();
+      });
+
+      // Edit Movie
+      async function editMovie(id) {
+        const res = await fetch(`${API_URL}/${id}`);
+        const movie = await res.json();
+        document.getElementById("movie-id").value = movie._id;
+        document.getElementById("title").value = movie.title;
+        document.getElementById("year").value = movie.year;
+        document.getElementById("genre").value = movie.genre;
+      }
+
+      // Delete Movie
+      async function deleteMovie(id) {
+        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        fetchMovies();
+      }
+
+      // Initial Fetch
+      fetchMovies();
+    </script>
+  </body>
+</html>
