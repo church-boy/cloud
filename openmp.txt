@@ -1,0 +1,146 @@
+
+sudo apt update
+sudo apt install build-essential
+
+gcc --version (sudo apt install gcc)
+
+nano hello.c
+
+#include <omp.h>
+#include <stdio.h>
+
+int main() {
+	#pragma omp parallel
+	{
+    	printf("Hello from thread %d\n", omp_get_thread_num());
+	}
+	return 0;
+}
+
+gcc -fopenmp -o hello hello.c
+./hello
+
+
+
+#include <stdio.h>
+#include <omp.h>
+
+int main() {
+    int i;
+    int n = 10; // Number of iterations
+    int sum = 0;
+
+    // Parallelize the loop with OpenMP
+    #pragma omp parallel for reduction(+:sum)
+    for (i = 0; i < n; i++) {
+        sum += i;
+        printf("Thread %d processing iteration %d\n", omp_get_thread_num(), i);
+    }
+
+    printf("Sum of integers from 0 to %d is %d\n", n-1, sum);
+    
+    return 0;
+}
+
+
+
+prime no
+
+
+
+#include <stdio.h>
+#include <omp.h>
+#include <math.h>
+
+// Function to check if a number is prime
+int is_prime(int num) {
+    if (num <= 1) return 0; // 0 and 1 are not prime numbers
+    if (num == 2) return 1; // 2 is prime
+    if (num % 2 == 0) return 0; // even numbers greater than 2 are not prime
+    
+    int sqrt_num = (int)sqrt(num);  // We only need to check divisors up to the square root of num
+    int is_prime_flag = 1;  // Flag to check if prime
+
+    #pragma omp parallel for
+    for (int i = 3; i <= sqrt_num; i += 2) {  // Check only odd divisors
+        if (num % i == 0) {
+            is_prime_flag = 0;  // Found a divisor, num is not prime
+        }
+    }
+
+    return is_prime_flag;  // Returns 1 if prime, 0 if not
+}
+
+int main() {
+    int num;
+    printf("Enter a number to check if it is prime: ");
+    scanf("%d", &num);
+
+    // Parallelizing the check process
+    int result;
+    #pragma omp parallel
+    {
+        #pragma omp single
+        result = is_prime(num);  // Check for primality
+    }
+
+    if (result) {
+        printf("%d is a prime number.\n", num);
+    } else {
+        printf("%d is not a prime number.\n", num);
+    }
+
+    return 0;
+}
+
+
+
+#include <stdio.h>
+#include <omp.h>
+#include <stdbool.h>
+
+void sieve_of_eratosthenes(int n) {
+    // Create an array to store whether each number is prime
+    bool prime[n+1];
+    
+    // Initialize all entries as true (prime)
+    for (int i = 0; i <= n; i++) {
+        prime[i] = true;
+    }
+
+    // 0 and 1 are not prime numbers
+    prime[0] = prime[1] = false;
+
+    // Parallelize the sieve process using OpenMP
+    #pragma omp parallel for
+    for (int p = 2; p * p <= n; p++) {
+        if (prime[p]) {  // If p is a prime number
+            // Mark all multiples of p as non-prime
+            for (int i = p * p; i <= n; i += p) {
+                prime[i] = false;
+            }
+        }
+    }
+
+    // Print all prime numbers
+    printf("Prime numbers up to %d are:\n", n);
+    for (int i = 2; i <= n; i++) {
+        if (prime[i]) {
+            printf("%d ", i);
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    int n;
+    printf("Enter the limit to generate prime numbers up to: ");
+    scanf("%d", &n);
+
+    // Call function to generate primes up to n
+    sieve_of_eratosthenes(n);
+
+    return 0;
+}
+
+

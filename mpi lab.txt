@@ -1,0 +1,20 @@
+sudo apt install python3
+
+sudo apt install -y -qq mpich
+
+sudo apt install python3-pip
+
+sudo pip install mpi4py
+
+gedit abc.py
+
+copy code
+#!/usr/bin/env python3
+from mpi4py import MPI
+c = MPI.COMM_WORLD
+r = c.Get_rank()  
+s = c.Get_size()  
+print(f"Hello from process {r} of {s}")
+
+mpirun -n 4 /usr/bin/python3 abc.py
+

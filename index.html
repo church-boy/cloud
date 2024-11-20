@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API</title>
+  </head>
+  <body>
+    <p id="advice"></p>
+    <button id="btn">Get Advice</button>
+    <script>
+      const text = document.getElementById("advice");
+      const fetchAdvice = async () => {
+        const res = await fetch("https://api.adviceslip.com/advice");
+        const obj = await res.json();
+
+        text.textContent = obj.slip.advice;
+      };
+
+      btn.addEventListener("click", fetchAdvice);
+    </script>
+  </body>
+</html>

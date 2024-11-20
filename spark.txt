@@ -1,0 +1,51 @@
+sudo apt update
+
+sudo apt install openjdk-11-jdk
+
+java -version
+
+sudo apt install scala
+
+wget https://downloads.apache.org/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
+
+cd Downloads
+
+tar -xvzf spark-3.5.3-bin-hadoop3.tgz
+
+sudo mv spark-3.5.3-bin-hadoop3 /opt/spark
+
+ls
+
+cd /usr/local
+
+cd spark
+
+ls
+
+cd 
+
+nano .bashrc
+
+export PATH=$PATH:/usr/local/spark/bin
+
+source .bashrc
+
+spark-shell
+
+create a file and give some words in it
+
+val textFile =sc.textFile("/home/tce/kumar.txt")
+
+val words=textFile.flatMap(line => line.split(" "))
+
+val wordpairs = words.map(word => (word,1))
+
+val wordcounts = wordpairs.reduceByKey((a, b) => a + b)
+
+wordcounts.saveAsTextFile("/home/tce/kumaroutput")
+
+val output=sc.textFile("/home/tce/kumaroutput")
+
+output.collect().foreach(println)
+
+

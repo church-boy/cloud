@@ -1,0 +1,152 @@
+import express from "express";
+
+let movies = [
+  { id: 1, title: "Fight Club" },
+  { id: 2, title: "Saving Private Ryan" },
+  { id: 3, title: "Forrest Gump" },
+];
+
+const port = 5000;
+const app = express();
+
+// Body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
+
+// Get all movies
+app.get("/api/movies", (req, res) => {
+  res.status(200).json(movies);
+});
+
+// Get a single movie
+app.get("/api/movies/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const movie = movies.find((movie) => movie.id === id);
+
+  if (movie) {
+    res.status(200).json(movie);
+  } else {
+    res
+      .status(404)
+      .json({ message: `A movie with the id of ${id} was not found` });
+  }
+});
+
+// Add a new movie
+app.post("/api/movies", (req, res) => {
+  const newMovie = {
+    id: movies.length + 1,
+    title: req.body.title,
+  };
+
+  if (!newMovie.title) {
+    return res.status(400).json({ message: "Please include a title" });
+  }
+
+  movies.push(newMovie);
+  res.status(201).json(movies);
+});
+
+// Update a movie
+app.put("/api/movies/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const movie = movies.find((movie) => movie.id === id);
+
+  if (!movie) {
+    return res
+      .status(404)
+      .json({ message: `A movie with the id of ${id} was not found` });
+  }
+
+  movie.title = req.body.title;
+  res.status(200).json(movies);
+});
+
+// Delete a movie
+app.delete("/api/movies/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const movie = movies.find((movie) => movie.id === id);
+
+  if (!movie) {
+    return res
+      .status(404)
+      .json({ message: `A movie with the id of ${id} was not found` });
+  }
+
+  movies = movies.filter((movie) => movie.id !== id);
+  res.status(200).json(movies);
+});
+
+app.listen(port, () => console.log(`Server started on port ${port}`));
+
+
+// Third-party API
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API</title>
+  </head>
+  <body>
+    <p id="advice"></p>
+    <button id="btn">Get Advice</button>
+    <script>
+      const text = document.getElementById("advice");
+      const fetchAdvice = async () => {
+        const res = await fetch("https://api.adviceslip.com/advice");
+        const obj = await res.json();
+
+        text.textContent = obj.slip.advice;
+      };
+
+      btn.addEventListener("click", fetchAdvice);
+    </script>
+  </body>
+</html>
+
+
+// News API
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>News API</h1>
+    <button class="btn">Get News</button>
+
+    <br />
+    <br />
+    <h1 class="title"></h1>
+    <p class="desc"></p>
+  </body>
+  <script src="main.js"></script>
+</html>
+
+const btn = document.querySelector(".btn");
+const title = document.querySelector(".title");
+const desc = document.querySelector(".desc");
+
+const API_KEY = "c4c55697bd804fe1a71543872864a6db";
+
+const getAdvice = async () => {
+  const res =
+    await fetch(`https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=${API_KEY}
+`);
+  const data = await res.json();
+
+  title.textContent = data.articles[1].title;
+  desc.textContent = data.articles[1].description;
+};
+
+btn.addEventListener("click", getAdvice);

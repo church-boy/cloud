@@ -1,0 +1,47 @@
+sudo apt update
+
+sudo apt install docker.io
+
+sudo systemctl start docker
+
+sudo systemctl enable docker
+
+sudo docker run hello-world
+
+nano app.py
+
+copy
+
+from flask import Flask, jsonify
+
+app= Flask(__name__)
+
+@app.route('/sum', methods=['GET'])
+def sum_array():
+	array=[1,2,3,4,5]
+	result =sum(array)
+	return jsonify({"sum": result})
+
+if __name__ =="__main__":
+	app.run(host='0.0.0.0', port=5000)
+
+nano Dockerfile
+ copy
+
+FROM python:3.9
+
+WORDDIR /app
+
+COPY requirments.txt .
+
+Run pip install -r requirments.txt
+
+COPY app.py .
+
+CMD ["python", "app.py"]
+
+ech0 Flask >> requirments.txt
+
+sudo  docker build -t sum-array-app
+
+sudo docker run -p 5000:5000 sum-array-app
