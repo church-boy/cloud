@@ -1,0 +1,183 @@
+https://github.com/SUDAR2005/cloud-model-lab
+OPEN MP:
+sudo apt update
+sudo apt install build-essential
+nano hello.c:
+#include <omp.h>s
+#include <stdio.h>
+
+int main() {
+   
+    
+        printf("Hello from thread %d\n", omp_get_thread_num());
+    
+    return 0;
+}
+gcc -fopenmp -o hello hello.c
+./hello
+
+
+
+
+MPI:
+sudo apt install python3
+sudo apt install -y -qq mpich
+sudo apt install python3-pip
+sudo apt install python3-mpi4py
+nano hello.py
+from mpi4py import MPI
+comm =MPI.COMM_WORLD
+rank=comm.Get_rank()
+size=comm.Get_size()
+print(f"Hello from process {rank} of {size}")
+mpirun -n 4 python/python3 hello.py
+
+
+SPARK:
+sudo apt install default-jdk
+java -version
+scala -version
+sudo apt-get install scala
+touch this -https://dlcdn.apache.org/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz
+cd Downloads
+ls
+tar -xvf ^C
+tar -xvf spark-3.5.3-bin-hadoop3.tgz
+sudo su
+cd Downloads
+mv spark-3.5.3-bin-hadoop3 /usr/local/spark
+cd
+nano .bashrc
+
+export PATH=$PATH:/usr/local/spark/bin
+
+
+source .bashrc
+spark-shell
+
+// Load the input text file
+val textFile = sc.textFile("text.txt")
+
+// Split the lines into words, count them, and display the result
+val wordCounts = textFile.flatMap(line => line.split(" "))
+                         .map(word => (word, 1))
+                         .reduceByKey(_ + _)
+
+// Print the results
+wordCounts.collect().foreach(println)
+
+
+
+
+
+DOCKER:
+sudo apt update
+sudo apt upgrade
+sudo apt install docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+docker --version
+
+mkdir docker-python-app
+cd docker-python-app
+echo 'print("Sum of numbers from 1 to 10 is:", sum(range(1, 11)))' > sum_numbers.py
+nano Dockerfile
+
+
+
+# Use the official Python image from Docker Hub
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
+
+# Command to run the Python program
+CMD ["python", "./sum_numbers.py"]
+
+
+sudo docker build -t sum_numbers.py .
+sudo docker run sum_numbers.py
+
+
+
+
+
+
+
+
+HADOOP
+sudo apt update
+sudo apt install ssh
+wget https://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
+tar -xzf Hadoop-3.3.6.tar.gz
+mv hadoop-3.3.6 Hadoop
+sudo apt install OpenJDK -11 - jdk
+java --version
+cd Hadoop
+$(dirname $(readlink -f $(which java)))
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export HADOOP_HOME=/home/osboxes/hadoop
+export HADOOP_INSTALL=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export HADOOP_YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE=$HADOOP_HOME/lib/native
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
+
+# Find Java Location Command
+dirname $(dirname $(readlink -f $(which java)))
+
+## Hadoop Configuration
+# For core-site.xml
+<property>
+  <name>fs.defaultFS</name>
+  <value>hdfs://localhost:9000</value>
+</property>
+
+# For hdfs-site.xml or https-site.xml
+<property>
+  <name>dfs.replication</name>
+  <value>3</value>
+</property><property>
+  <name>dfs.name.dir</name>
+  <value>/home/osboxes/hadoop/data/namenode</value>
+</property><property>
+  <name>dfs.data.dir</name>
+  <value>/home/osboxes/hadoop/data/datanode</value>
+</property>
+
+# For mapred-site.xml
+<property>
+  <name>mapreduce.framework.name</name>
+  <value>yarn</value>
+</property>
+
+# For yarn-site.xml
+<property>
+  <name>yarn.nodemanager.aux-services</name>
+  <value>mapreduce_shuffle</value>
+</property><property>
+  <name>yarn.nodemanager.auxservices.mapreduce.shuffle.class</name>
+  <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+</property>
+
+# SSH Key Configure
+ssh-keygen -t rsa
+# replace id_rsa as authorized keys
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+# add read and write access
+chmod 640 ~/.ssh/authorized_keys
+
+
+.......................................................................................
+
+
+
+
+
+
